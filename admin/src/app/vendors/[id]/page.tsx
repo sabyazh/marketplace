@@ -60,7 +60,7 @@ export default function VendorDetailPage() {
 
   const commissionMutation = useMutation({
     mutationFn: (rate: number) =>
-      apiPut(`/admin/vendors/${vendorId}/commission`, { commission_rate: rate }),
+      apiPut(`/admin/vendors/${vendorId}/commission`, { commission_pct: rate }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendor', vendorId] });
     },
@@ -105,7 +105,7 @@ export default function VendorDetailPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <span className="text-lg font-semibold">{vendor.rating.toFixed(1)}</span>
+                <span className="text-lg font-semibold">{(vendor.avg_rating || 0).toFixed(1)}</span>
                 <span className="text-sm text-gray-500">({vendor.total_reviews} reviews)</span>
               </div>
             </div>
@@ -114,11 +114,11 @@ export default function VendorDetailPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Badge variant="indigo">{vendor.business_type}</Badge>
+                  <Badge variant="indigo">{(vendor.vendor_type || 'product').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</Badge>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <MapPin className="h-4 w-4 text-gray-400" />
-                  <span>{vendor.address_line1}, {vendor.city}, {vendor.state} - {vendor.pincode}</span>
+                  <span>{vendor.address}, {vendor.city}, {vendor.state} - {vendor.pincode}</span>
                 </div>
                 {vendor.user?.phone && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -134,22 +134,10 @@ export default function VendorDetailPage() {
                 )}
               </div>
               <div className="space-y-3">
-                {vendor.gstin && (
+                {vendor.service_radius_km > 0 && (
                   <div className="text-sm">
-                    <span className="font-medium text-gray-500">GSTIN: </span>
-                    <span className="text-gray-700">{vendor.gstin}</span>
-                  </div>
-                )}
-                {vendor.pan_number && (
-                  <div className="text-sm">
-                    <span className="font-medium text-gray-500">PAN: </span>
-                    <span className="text-gray-700">{vendor.pan_number}</span>
-                  </div>
-                )}
-                {vendor.bank_name && (
-                  <div className="text-sm">
-                    <span className="font-medium text-gray-500">Bank: </span>
-                    <span className="text-gray-700">{vendor.bank_name}</span>
+                    <span className="font-medium text-gray-500">Service Radius: </span>
+                    <span className="text-gray-700">{vendor.service_radius_km} km</span>
                   </div>
                 )}
                 <div className="text-sm">
@@ -238,7 +226,7 @@ export default function VendorDetailPage() {
                   min="0"
                   max="100"
                   step="0.5"
-                  placeholder={vendor.commission_rate.toString()}
+                  placeholder={(vendor.commission_pct || 0).toString()}
                   value={commissionRate}
                   onChange={(e) => setCommissionRate(e.target.value)}
                 />
@@ -256,7 +244,7 @@ export default function VendorDetailPage() {
                 </Button>
               </div>
               <p className="text-xs text-gray-500">
-                Current: {vendor.commission_rate}%
+                Current: {vendor.commission_pct || 0}%
               </p>
             </div>
           </CardContent>

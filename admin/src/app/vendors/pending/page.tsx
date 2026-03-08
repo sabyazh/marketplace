@@ -57,7 +57,7 @@ export default function PendingVendorsPage() {
                         {vendor.business_name}
                       </h3>
                       <Badge variant="indigo">
-                        {vendor.business_type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                        {(vendor.vendor_type || 'product').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
                       </Badge>
                     </div>
                     <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">

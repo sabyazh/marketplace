@@ -29,14 +29,14 @@ export default function CategoriesPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['categories', activeTab],
-    queryFn: () => apiGet<Category[]>(`/admin/categories?type=${activeTab}`),
+    queryFn: () => apiGet<Category[]>(`/categories?type=${activeTab}`),
   });
 
   const createMutation = useMutation({
     mutationFn: (payload: {
       name: string;
       slug: string;
-      type: CategoryType;
+      category_type: CategoryType;
       parent_id?: string;
     }) => apiPost('/admin/categories', payload),
     onSuccess: () => {
@@ -101,7 +101,7 @@ export default function CategoriesPage() {
     setEditingCategory(cat);
     setFormName(cat.name);
     setFormSlug(cat.slug);
-    setFormType(cat.type);
+    setFormType(cat.category_type);
     setFormParentId(cat.parent_id || '');
     setDialogOpen(true);
   }
@@ -129,7 +129,7 @@ export default function CategoriesPage() {
       createMutation.mutate({
         name: formName,
         slug: formSlug,
-        type: formType,
+        category_type: formType,
         parent_id: formParentId || undefined,
       });
     }

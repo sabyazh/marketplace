@@ -301,7 +301,7 @@ export default function DashboardPage() {
                       {vendor.business_name}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {vendor.city} &middot; {vendor.business_type}
+                      {vendor.city} &middot; {vendor.vendor_type || 'product'}
                     </p>
                   </Link>
                 ))}

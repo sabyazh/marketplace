@@ -28,11 +28,11 @@ const columns: ColumnDef<Vendor, unknown>[] = [
     ),
   },
   {
-    accessorKey: 'business_type',
+    accessorKey: 'vendor_type',
     header: 'Type',
     cell: ({ row }) => (
       <Badge variant="indigo">
-        {row.original.business_type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+        {(row.original.vendor_type || 'product').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
       </Badge>
     ),
   },
@@ -46,19 +46,19 @@ const columns: ColumnDef<Vendor, unknown>[] = [
     header: 'City',
   },
   {
-    accessorKey: 'rating',
+    accessorKey: 'avg_rating',
     header: 'Rating',
     cell: ({ row }) => (
       <div className="flex items-center gap-1">
         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-        <span>{row.original.rating.toFixed(1)}</span>
+        <span>{(row.original.avg_rating || 0).toFixed(1)}</span>
       </div>
     ),
   },
   {
-    accessorKey: 'commission_rate',
+    accessorKey: 'commission_pct',
     header: 'Commission %',
-    cell: ({ row }) => `${row.original.commission_rate}%`,
+    cell: ({ row }) => `${row.original.commission_pct || 0}%`,
   },
   {
     id: 'actions',
