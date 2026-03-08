@@ -150,6 +150,7 @@ func (r *productRepository) GetProduct(ctx context.Context, id uuid.UUID) (*Prod
 	var p Product
 	if err := r.db.WithContext(ctx).
 		Preload("Category").
+		Preload("Vendor").
 		Where("id = ?", id).
 		First(&p).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -179,6 +180,10 @@ func (r *productRepository) ListProducts(ctx context.Context, params pagination.
 	if filters.IsActive != nil {
 		query = query.Where("is_active = ?", *filters.IsActive)
 	}
+	if filters.Search != "" {
+		search := "%" + filters.Search + "%"
+		query = query.Where("name ILIKE ? OR slug ILIKE ?", search, search)
+	}
 
 	var total int64
 	if err := query.Count(&total).Error; err != nil {
@@ -191,6 +196,7 @@ func (r *productRepository) ListProducts(ctx context.Context, params pagination.
 	var products []Product
 	if err := query.
 		Preload("Category").
+		Preload("Vendor").
 		Order(orderClause).
 		Offset(params.Offset()).
 		Limit(params.PerPage).
@@ -216,6 +222,7 @@ func (r *productRepository) ListByVendor(ctx context.Context, vendorID uuid.UUID
 	var products []Product
 	if err := query.
 		Preload("Category").
+		Preload("Vendor").
 		Order("created_at DESC").
 		Offset(params.Offset()).
 		Limit(params.PerPage).
@@ -242,6 +249,7 @@ func (r *productRepository) ListByCategory(ctx context.Context, categoryID uuid.
 	var products []Product
 	if err := query.
 		Preload("Category").
+		Preload("Vendor").
 		Order("created_at DESC").
 		Offset(params.Offset()).
 		Limit(params.PerPage).
@@ -284,6 +292,7 @@ func (r *productRepository) GetLowStockProducts(ctx context.Context, vendorID uu
 	var products []Product
 	if err := query.
 		Preload("Category").
+		Preload("Vendor").
 		Order("stock_quantity ASC").
 		Offset(params.Offset()).
 		Limit(params.PerPage).

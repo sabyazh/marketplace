@@ -99,29 +99,51 @@ type UpdateStockRequest struct {
 // Product Response DTOs
 // ---------------------------------------------------------------------------
 
+// ProductVendorResponse is a lightweight vendor summary embedded in product responses.
+type ProductVendorResponse struct {
+	ID           uuid.UUID `json:"id"`
+	BusinessName string    `json:"business_name"`
+	LogoURL      *string   `json:"logo_url,omitempty"`
+	VendorType   string    `json:"vendor_type,omitempty"`
+	Status       string    `json:"status,omitempty"`
+	City         string    `json:"city,omitempty"`
+	IsOnline     bool      `json:"is_online"`
+}
+
+// ProductCategoryResponse is a lightweight category summary embedded in product responses.
+type ProductCategoryResponse struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Slug         string    `json:"slug"`
+	CategoryType string    `json:"category_type,omitempty"`
+	ImageURL     *string   `json:"image_url,omitempty"`
+}
+
 // ProductResponse is the public representation of a product.
 type ProductResponse struct {
-	ID                uuid.UUID  `json:"id"`
-	VendorID          uuid.UUID  `json:"vendor_id"`
-	CategoryID        uuid.UUID  `json:"category_id"`
-	CategoryName      string     `json:"category_name"`
-	Name              string     `json:"name"`
-	Slug              string     `json:"slug"`
-	Description       *string    `json:"description,omitempty"`
-	Price             float64    `json:"price"`
-	ComparePrice      *float64   `json:"compare_price,omitempty"`
-	Unit              string     `json:"unit"`
-	SKU               *string    `json:"sku,omitempty"`
-	Images            []string   `json:"images,omitempty"`
-	IsActive          bool       `json:"is_active"`
-	AvgRating         float64    `json:"avg_rating"`
-	TotalReviews      int        `json:"total_reviews"`
-	StockQuantity     int        `json:"stock_quantity"`
-	LowStockThreshold int        `json:"low_stock_threshold"`
-	WeightGrams       *int       `json:"weight_grams,omitempty"`
-	Tags              []string   `json:"tags,omitempty"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
+	ID                uuid.UUID                `json:"id"`
+	VendorID          uuid.UUID                `json:"vendor_id"`
+	CategoryID        uuid.UUID                `json:"category_id"`
+	CategoryName      string                   `json:"category_name"`
+	Name              string                   `json:"name"`
+	Slug              string                   `json:"slug"`
+	Description       *string                  `json:"description,omitempty"`
+	Price             float64                  `json:"price"`
+	ComparePrice      *float64                 `json:"compare_price,omitempty"`
+	Unit              string                   `json:"unit"`
+	SKU               *string                  `json:"sku,omitempty"`
+	Images            []string                 `json:"images,omitempty"`
+	IsActive          bool                     `json:"is_active"`
+	AvgRating         float64                  `json:"avg_rating"`
+	TotalReviews      int                      `json:"total_reviews"`
+	StockQuantity     int                      `json:"stock_quantity"`
+	LowStockThreshold int                      `json:"low_stock_threshold"`
+	WeightGrams       *int                     `json:"weight_grams,omitempty"`
+	Tags              []string                 `json:"tags,omitempty"`
+	CreatedAt         time.Time                `json:"created_at"`
+	UpdatedAt         time.Time                `json:"updated_at"`
+	Vendor            *ProductVendorResponse   `json:"vendor,omitempty"`
+	Category          *ProductCategoryResponse `json:"category,omitempty"`
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +157,7 @@ type ProductListFilters struct {
 	MinPrice   *float64   `json:"min_price,omitempty"`
 	MaxPrice   *float64   `json:"max_price,omitempty"`
 	IsActive   *bool      `json:"is_active,omitempty"`
+	Search     string     `json:"search,omitempty"`
 	SortBy     string     `json:"sort_by,omitempty"`
 	SortOrder  string     `json:"sort_order,omitempty"`
 }
@@ -193,6 +216,30 @@ func toProductResponse(p *Product) ProductResponse {
 		Tags:              p.Tags,
 		CreatedAt:         p.CreatedAt,
 		UpdatedAt:         p.UpdatedAt,
+	}
+
+	// Populate nested vendor if preloaded
+	if p.Vendor.ID != uuid.Nil {
+		resp.Vendor = &ProductVendorResponse{
+			ID:           p.Vendor.ID,
+			BusinessName: p.Vendor.BusinessName,
+			LogoURL:      p.Vendor.LogoURL,
+			VendorType:   p.Vendor.VendorType,
+			Status:       p.Vendor.Status,
+			City:         p.Vendor.City,
+			IsOnline:     p.Vendor.IsOnline,
+		}
+	}
+
+	// Populate nested category if preloaded
+	if p.Category.ID != uuid.Nil {
+		resp.Category = &ProductCategoryResponse{
+			ID:           p.Category.ID,
+			Name:         p.Category.Name,
+			Slug:         p.Category.Slug,
+			CategoryType: p.Category.CategoryType,
+			ImageURL:     p.Category.ImageURL,
+		}
 	}
 
 	return resp

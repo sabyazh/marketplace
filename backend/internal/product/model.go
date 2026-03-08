@@ -29,6 +29,24 @@ func (Category) TableName() string {
 	return "categories"
 }
 
+// ProductVendor is a lightweight representation of a vendor used for preloading
+// within the product module. It maps to the same "vendors" table.
+type ProductVendor struct {
+	ID           uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	UserID       uuid.UUID `gorm:"type:uuid" json:"user_id"`
+	BusinessName string    `gorm:"type:varchar(255)" json:"business_name"`
+	LogoURL      *string   `gorm:"type:varchar(500)" json:"logo_url,omitempty"`
+	VendorType   string    `gorm:"type:varchar(50)" json:"vendor_type"`
+	Status       string    `gorm:"type:varchar(20)" json:"status"`
+	City         string    `gorm:"type:varchar(100)" json:"city"`
+	IsOnline     bool      `json:"is_online"`
+}
+
+// TableName tells GORM to use the vendors table for ProductVendor.
+func (ProductVendor) TableName() string {
+	return "vendors"
+}
+
 // Product represents a row in the products table.
 type Product struct {
 	ID                uuid.UUID      `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
@@ -53,6 +71,7 @@ type Product struct {
 	UpdatedAt         time.Time      `json:"updated_at"`
 	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
 	Category          Category       `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Vendor            ProductVendor  `gorm:"foreignKey:VendorID" json:"vendor,omitempty"`
 }
 
 // TableName overrides the default GORM table name.

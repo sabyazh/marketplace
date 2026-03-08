@@ -385,6 +385,7 @@ func parseProductFilters(c *fiber.Ctx) ProductListFilters {
 		}
 	}
 
+	filters.Search = c.Query("search")
 	filters.SortBy = c.Query("sort_by")
 	filters.SortOrder = c.Query("sort_order")
 
