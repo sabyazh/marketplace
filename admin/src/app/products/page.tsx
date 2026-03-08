@@ -18,21 +18,24 @@ const columns: ColumnDef<Product, unknown>[] = [
     accessorKey: 'thumbnail_url',
     header: 'Image',
     enableSorting: false,
-    cell: ({ row }) => (
-      <div className="h-10 w-10 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-        {row.original.thumbnail_url ? (
-          <img
-            src={row.original.thumbnail_url}
-            alt={row.original.name}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Package className="h-5 w-5 text-gray-300" />
-          </div>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const imgUrl = row.original.thumbnail_url || row.original.images?.[0];
+      return (
+        <div className="h-10 w-10 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+          {imgUrl ? (
+            <img
+              src={imgUrl}
+              alt={row.original.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <Package className="h-5 w-5 text-gray-300" />
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'name',
