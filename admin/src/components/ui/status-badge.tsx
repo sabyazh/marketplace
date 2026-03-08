@@ -41,8 +41,9 @@ interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
 }
 
 export function StatusBadge({ status, ...props }: StatusBadgeProps) {
-  const variant = statusVariantMap[status] || 'default';
-  const displayLabel = status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const safeStatus = status || 'unknown';
+  const variant = statusVariantMap[safeStatus] || 'default';
+  const displayLabel = safeStatus.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <Badge variant={variant} {...props}>

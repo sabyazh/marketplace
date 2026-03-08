@@ -88,7 +88,17 @@ const columns: ColumnDef<Product, unknown>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
+    cell: ({ row }) => {
+      const p = row.original;
+      // Backend returns is_active (boolean), derive status string
+      const isActive = (p as unknown as Record<string, unknown>).is_active;
+      const status = isActive === false
+        ? 'inactive'
+        : p.stock_quantity <= 0
+          ? 'out_of_stock'
+          : p.status || 'active';
+      return <StatusBadge status={status} />;
+    },
   },
   {
     id: 'actions',
