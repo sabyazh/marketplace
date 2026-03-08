@@ -23,22 +23,49 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiPost<{ token: string; user: User }>('/auth/login', {
+      const response = await apiPost<{
+        access_token: string;
+        refresh_token: string;
+        user: {
+          id: string;
+          full_name: string;
+          email: string;
+          phone: string;
+          role: string;
+          avatar_url: string;
+        };
+      }>('/auth/login/email', {
         email,
         password,
       });
-      const { token, user } = response.data;
+      const { access_token, user: authUser } = response.data;
 
-      if (user.role !== 'admin') {
+      if (authUser.role !== 'admin') {
         set({ isLoading: false, error: 'Access denied. Admin privileges required.' });
         return;
       }
 
-      localStorage.setItem('admin_token', token);
+      // Map backend auth response to admin User type
+      const user: User = {
+        id: authUser.id,
+        email: authUser.email,
+        phone: authUser.phone || '',
+        first_name: authUser.full_name.split(' ')[0] || '',
+        last_name: authUser.full_name.split(' ').slice(1).join(' ') || '',
+        role: authUser.role as User['role'],
+        status: 'active',
+        avatar_url: authUser.avatar_url || undefined,
+        email_verified: true,
+        phone_verified: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      localStorage.setItem('admin_token', access_token);
       localStorage.setItem('admin_user', JSON.stringify(user));
 
       set({
-        token,
+        token: access_token,
         user,
         isAuthenticated: true,
         isLoading: false,
